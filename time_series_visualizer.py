@@ -27,15 +27,15 @@ def draw_line_plot():
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
     df_bar = df.copy()
-    df_bar = df_bar.groupby(pd.PeriodIndex(df_bar.index, freq="M"))['value'].mean()
+    df_bar['year'] = df.index.year
+    df_bar['month'] = df.index.month_name()
 
-    # Draw bar plot
-    month_dict = {
-    1:"January", 2: "February", 3: "March", 4: "April", 
-    5: "May", 6: "June", 7: "July", 8: "August", 
-    9: "September", 10: "October", 11: "November", 12: "December"
-    }
-    fig = df_bar.pivot('Year','Month','value').rename(columns=month_dict).plot.bar(figsize=(6,6))
+    df_bar_group = df_bar.groupby(['year', 'month'])['value'].mean()
+    df_bar_group = df_bar_group.unstack(level='month')
+    df_bar_group = df_bar_group[['January', 'February', 'March', 'April', 'May',
+                                'June', 'July', 'August', 'September', 'October', 'November', 'December']]
+  
+    fig = df_bar_group.plot.bar(figsize=(6,6))
     plt.xlabel('Years')
     plt.ylabel('Average Page Views')
     fig = fig.figure
